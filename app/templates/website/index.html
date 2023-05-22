@@ -1,0 +1,26 @@
+{% extends "base.html" %}                                                     
+{% import "bootstrap/wtf.html" as wtf %}                                      
+                                                                              
+{% block app_content %}                                                       
+                                                                              
+    <div class="row">                                                         
+        <div class="col-md-4">                                               
+            <p>Welcome to the gestionate tests analisys tool.</p>             
+            <br>
+            <p>Locations loaded: {{ data_info.loc_qty }}.</p>
+            <p>Locations load date: {{ data_info.loc_last_mod }}.</p>
+            <br>
+            <p>Tickets loaded: {{ data_info.tickets_qty }}.</p>
+            <p>First ticket: {{ data_info.first_ticket }}.</p>
+            <p>Last ticket: {{ data_info.last_ticket }}.</p>
+            <p>Tickets load date: {{ data_info.tkt_last_mod }}.</p>
+        </div>                                                                
+    </div>                                                                
+    <br>
+    <div class="row">
+        <div class="col-md-4">
+            <p>Build report with the following form:<p>
+            {{ wtf.quick_form(form) }}
+        </div>                                                                
+    </div>                                                                    
+{% endblock %}                                                            
