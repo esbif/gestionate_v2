@@ -301,46 +301,50 @@ def remove_locations(evaluated_tests, remove_list):
     return evaluated_tests
 
 
-def build_report(tests, tickets, locations, path):
-     with pd.ExcelWriter(path, engine="xlsxwriter") as writer:
+def build_report(tests, tickets, locations, path, remove_list=None):
+    
+    with pd.ExcelWriter(path) as writer:
         for profile in tests["profile"].unique():
             tmp_tests = filter_tests(tests, profile=profile)
-            
+
             profile_suffix = ""
             profile_suffix += profile.split("-")[0].split(":")[1]
             profile_suffix += "X"
             profile_suffix += profile.split("-")[1].split(":")[1]
-            
+
             profile_progress = get_progress(tmp_tests)
             profile_vsats = get_vsats(tmp_tests, tickets, locations)
-            
+
             succeeded_tests = filter_tests(tmp_tests, res="succeeded")
             profile_hours = get_hours(succeeded_tests)
-            
+
             dn_br = pd.pivot_table(
-                    succeeded_tests, values="dn_br", index="date", 
-                    columns="site_code", aggfunc=np.max, fill_value=np.nan)
+                   succeeded_tests, values="dn_br", index="date", 
+                   columns="site_code", aggfunc=np.max, fill_value=np.nan)
             up_br = pd.pivot_table(
-                    succeeded_tests, values="up_br", index="date", 
-                    columns="site_code", aggfunc=np.max, fill_value=np.nan)
+                   succeeded_tests, values="up_br", index="date", 
+                   columns="site_code", aggfunc=np.max, fill_value=np.nan)
 
             count = pd.pivot_table(
-                    succeeded_tests, values="site", index="date", 
-                    columns="site_code", aggfunc="count", 
-                    fill_value=np.nan)
-            
+                   succeeded_tests, values="site", index="date", 
+                   columns="site_code", aggfunc="count", 
+                   fill_value=np.nan)
+
             profile_progress.to_excel(
-                    writer, sheet_name="Progress " + profile_suffix)
+                   writer, sheet_name="Progress " + profile_suffix)
             profile_vsats.to_excel(
-                    writer, sheet_name="VSATs " + profile_suffix)
+                   writer, sheet_name="VSATs " + profile_suffix)
             profile_hours.to_excel(
-                    writer, sheet_name="Hours " + profile_suffix)
+                   writer, sheet_name="Hours " + profile_suffix)
             dn_br.to_excel(writer, sheet_name="Download " + profile_suffix)
             up_br.to_excel(writer, sheet_name="Upload " + profile_suffix)
             count.to_excel(writer, sheet_name="Count " + profile_suffix)
-            
+                       
         general_progress = get_progress(tests)
         general_progress.to_excel(writer, sheet_name="General Progress")
         tests.to_excel(writer, sheet_name="All Tests")
-    return path
-    
+
+        if remove_list:
+            pd.Series(remove_list).to_excel(writer, sheet_name="Remove List")
+
+        return path
