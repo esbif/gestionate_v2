@@ -324,7 +324,6 @@ def build_report(tests, tickets, locations, path):
                     succeeded_tests, values="up_br", index="date", 
                     columns="site_code", aggfunc=np.max, fill_value=np.nan)
 
-            # ¿Tengo que tomar la cuenta de los succeeded o de todos?
             count = pd.pivot_table(
                     succeeded_tests, values="site", index="date", 
                     columns="site_code", aggfunc="count", 
@@ -343,4 +342,5 @@ def build_report(tests, tickets, locations, path):
         general_progress = get_progress(tests)
         general_progress.to_excel(writer, sheet_name="General Progress")
         tests.to_excel(writer, sheet_name="All Tests")
+    return path
     
