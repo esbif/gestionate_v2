@@ -248,10 +248,13 @@ def get_vsats(
             return pd.Series({
                     "total_dn_time": tickets["dn_time"].sum()})
             
-        tmp_tickets = tmp_tickets.groupby("site_code").apply(
-                calc_dn_time).reset_index()
+        if tmp_tickets.empty:
+            res["total_dn_time"] = timedelta(0)
 
-        res = pd.merge(res, tmp_tickets, on="site_code", how="left")
+        else:
+            tmp_tickets = tmp_tickets.groupby("site_code").apply(
+                    calc_dn_time).reset_index()
+            res = pd.merge(res, tmp_tickets, on="site_code", how="left")
 
         def check_valid_sites(row):
             if row["succeeded"] < 30:
